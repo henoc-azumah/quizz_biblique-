@@ -20,6 +20,9 @@ const quizScreen = $('quizScreen');
 const endScreen = $('endScreen');
 const readyOverlay = $('readyOverlay');
 
+const tickSound = $('tickSound');
+const timeoutSound = $('timeoutSound');
+
 const timerInput = $('timerInput');
 const timerMinus = $('timerMinus');
 const timerPlus = $('timerPlus');
@@ -186,6 +189,12 @@ function prepareNextQuestion() {
     chapitreIn.value = "";
     versetNumIn.value = "";
 
+    // Reset sounds
+    tickSound.pause();
+    tickSound.currentTime = 0;
+    timeoutSound.pause();
+    timeoutSound.currentTime = 0;
+
     // Clear timer
     clearInterval(timerInterval);
     timerBar.style.width = '100%';
@@ -206,6 +215,10 @@ function handleSubmit() {
     if (isAnswered) return;
     isAnswered = true;
     clearInterval(timerInterval);
+
+    // Stop ticking sound
+    tickSound.pause();
+    tickSound.currentTime = 0;
 
     const livre = livreSelect.value;
     const chap = chapitreIn.value.trim();
@@ -243,10 +256,22 @@ function startTimer() {
         timeRemaining--;
         updateTimerUI();
 
-        if (timeRemaining <= 10) timerDisplay.classList.add('warning');
+        if (timeRemaining <= 10 && timeRemaining > 0) {
+            timerDisplay.classList.add('warning');
+            // Play tick sound
+            tickSound.currentTime = 0;
+            tickSound.play().catch(e => console.log("Audio play prevented:", e));
+        }
 
         if (timeRemaining <= 0) {
             clearInterval(timerInterval);
+            timerDisplay.classList.add('warning');
+
+            // Play timeout sound
+            tickSound.pause();
+            timeoutSound.currentTime = 0;
+            timeoutSound.play().catch(e => console.log("Audio play prevented:", e));
+
             handleSubmit(); // Auto-submit on timeout
         }
     }, 1000);
