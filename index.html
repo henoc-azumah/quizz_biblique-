@@ -1,24 +1,171 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Biblique</title>
+    <title>Mémorisation Biblique</title>
+    <meta name="description"
+        content="Application de mémorisation de versets bibliques avec quiz interactif et minuteur.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="container">
-        <h1>Quiz Biblique</h1>
-        <div id="verset"></div>
 
-        <input type="text" id="livre" placeholder="Livre">
-        <input type="text" id="chapitre" placeholder="Chapitre">
-        <input type="text" id="versetNum" placeholder="Verset">
-        <button id="submit">Valider</button>
+    <!-- HEADER -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <span class="header-icon">📖</span>
+            <h1 class="header-title">Mémorisation Biblique</h1>
+        </div>
+        <div class="header-right">
+            <div class="score-badge score-correct" id="scoreBadge">
+                <span class="score-icon">👑</span>
+                <span id="scoreCount">0</span>
+            </div>
+            <div class="score-badge score-wrong" id="wrongBadge">
+                <span class="score-icon">👎</span>
+                <span id="wrongCount">0</span>
+            </div>
+        </div>
+    </header>
 
-        <p id="result"></p>
-        <p>Score : <span id="score">0</span></p>
+    <!-- START SCREEN -->
+    <div class="screen" id="startScreen">
+        <div class="start-card">
+            <div class="settings-grid">
+                <!-- Question Count -->
+                <div class="setting-item">
+                    <label for="questionCountInput" class="timer-label">Nombre de questions</label>
+                    <input type="number" id="questionCountInput" value="10" min="1" max="100" class="form-input">
+                </div>
+
+                <!-- Timer Setting -->
+                <div class="setting-item">
+                    <label for="timerInput" class="timer-label">Durée par verset (sec)</label>
+                    <div class="timer-input-group">
+                        <button class="timer-btn" id="timerMinus" type="button">−</button>
+                        <input type="number" id="timerInput" value="45" min="10" max="600" step="5">
+                        <button class="timer-btn" id="timerPlus" type="button">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Book Selection -->
+            <div class="book-selection">
+                <div class="book-selection-header">
+                    <h3 class="book-selection-title">Sélectionnez les livres</h3>
+                    <div class="book-selection-actions">
+                        <button type="button" class="btn-text" id="selectAllBooks">Tout sélectionner</button>
+                        <button type="button" class="btn-text" id="deselectAllBooks">Tout désélectionner</button>
+                    </div>
+                </div>
+                <div class="book-grid" id="bookGrid">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+
+            <button class="btn-primary btn-start" id="startBtn">
+                Commencer la session
+                <span class="btn-arrow">→</span>
+            </button>
+        </div>
     </div>
+
+    <!-- QUIZ SCREEN -->
+    <div class="screen hidden" id="quizScreen">
+        <!-- Ready Overlay -->
+        <div class="ready-overlay" id="readyOverlay">
+            <div class="ready-content">
+                <div class="ready-icon">📖</div>
+                <h2 class="ready-title">Prêt pour le prochain verset ?</h2>
+                <p class="ready-subtitle" id="questionProgress">Verset 1 sur 10</p>
+                <button class="btn-primary btn-ready" id="readyBtn">JE SUIS PRÊT !</button>
+            </div>
+        </div>
+
+        <!-- Timer Bar -->
+        <div class="timer-bar-container">
+            <div class="timer-bar" id="timerBar"></div>
+        </div>
+        <div class="timer-display" id="timerDisplay">00:45</div>
+
+        <main class="quiz-container">
+            <!-- Verse Card -->
+            <div class="verse-card" id="verseCard">
+                <p class="verse-text" id="verseText"></p>
+            </div>
+
+            <!-- Answer Section -->
+            <div class="answer-card" id="answerCard">
+                <h3 class="answer-title">Quelle est la référence ?</h3>
+
+                <div class="form-group">
+                    <label for="livre" class="form-label">Livre</label>
+                    <select id="livre" class="form-select">
+                        <option value="" disabled selected>Sélectionnez un livre</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="chapitre" class="form-label">Chapitre</label>
+                        <input type="number" id="chapitre" class="form-input" placeholder="—" min="1">
+                    </div>
+                    <div class="form-separator">:</div>
+                    <div class="form-group">
+                        <label for="versetNum" class="form-label">Verset</label>
+                        <input type="number" id="versetNum" class="form-input" placeholder="—" min="1">
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="submitBtn">Valider</button>
+
+                <!-- Feedback -->
+                <div class="feedback hidden" id="feedback">
+                    <p class="feedback-label" id="feedbackLabel"></p>
+                    <p class="feedback-answer" id="feedbackAnswer"></p>
+                </div>
+
+                <!-- Next Button -->
+                <button class="btn-primary btn-next hidden" id="nextBtn">
+                    Verset suivant
+                    <span class="btn-arrow">→</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- END SCREEN -->
+    <div class="screen hidden" id="endScreen">
+        <div class="end-card">
+            <div class="end-icon">🏆</div>
+            <h2 class="end-title">Session terminée !</h2>
+            <div class="end-stats">
+                <div class="stat-item stat-correct">
+                    <span class="stat-number" id="finalScore">0</span>
+                    <span class="stat-label">Bonnes réponses</span>
+                </div>
+                <div class="stat-item stat-wrong">
+                    <span class="stat-number" id="finalWrong">0</span>
+                    <span class="stat-label">Mauvaises réponses</span>
+                </div>
+                <div class="stat-item stat-total">
+                    <span class="stat-number" id="finalTotal">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+            </div>
+            <button class="btn-primary btn-start" id="restartBtn">
+                Nouvelle session
+                <span class="btn-arrow">→</span>
+            </button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
+
 </html>
