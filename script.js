@@ -5,8 +5,8 @@ let sessionVerses = [];
 let currentIndex = -1;
 let score = 0;
 let wrong = 0;
-let timerDuration = 45;
-let timeRemaining = 45;
+let timerDuration = 60;
+let timeRemaining = 60;
 let timerInterval = null;
 let isAnswered = false;
 
@@ -137,7 +137,7 @@ function startSession() {
     }
 
     const numQuestions = parseInt(questionCountInput.value) || 10;
-    timerDuration = parseInt(timerInput.value) || 45;
+    timerDuration = parseInt(timerInput.value) || 60;
 
     // Filter verses by selected books
     const matchingVerses = allVerses.filter(v => selectedBooks.includes(v.book_name));
