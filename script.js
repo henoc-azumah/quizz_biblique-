@@ -256,7 +256,7 @@ function startTimer() {
         timeRemaining--;
         updateTimerUI();
 
-        if (timeRemaining <= 10 && timeRemaining > 0) {
+        if (timeRemaining <= 15 && timeRemaining > 0) {
             timerDisplay.classList.add('warning');
             // Play tick sound
             tickSound.currentTime = 0;
